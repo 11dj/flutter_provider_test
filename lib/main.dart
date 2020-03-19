@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider_test/screens/a_view.dart';
-import 'package:provider_test/screens/b_view.dart';
-import 'package:provider_test/screens/c_view.dart';
+import 'package:provider/provider.dart';
+import 'package:provider_test/screens/a.dart';
+import 'package:provider_test/screens/b.dart';
+import 'package:provider_test/screens/c.dart';
+
+import 'package:provider_test/models/a.dart';
 
 void main() => runApp(MyApp());
 
@@ -35,7 +38,14 @@ class _MyHomePageState extends State<MyHomePage> {
     CView(),
   ];
 
+  @override
+  void didChangeDependencies() {
+    print('Child widget: didChangeDependencies(), counter = $_counter');
+    super.didChangeDependencies();
+  }
+
   void _incrementCounter() {
+    print(_counter);
     setState(() {
       _counter++;
     });
@@ -47,36 +57,56 @@ class _MyHomePageState extends State<MyHomePage> {
    });
  }
 
+ bar(title) {
+   return BottomNavigationBarItem(
+           icon: Icon(Icons.home),
+           title: Text(title)
+         );
+ }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ProviderA>(create: (context) => ProviderA())
+        ],
+      child: Scaffold(
+        appBar: AppBar(title: Text(widget.title),),
+        body: _children[_currentIndex],
+        floatingActionButton: FloatingActionButton(
+          onPressed: _incrementCounter,
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        items: [
+          bar('AAA'),         
+          bar('BBB'),         
+          bar('CCC'),         
+        ],
       ),
-      body: _children[_currentIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-       onTap: onTabTapped, // new
-       currentIndex: _currentIndex, // new
-       items: [
-         BottomNavigationBarItem(
-           icon: new Icon(Icons.home),
-           title: new Text('Home'),
-         ),
-         BottomNavigationBarItem(
-           icon: new Icon(Icons.mail),
-           title: new Text('Messages'),
-         ),
-         BottomNavigationBarItem(
-           icon: Icon(Icons.person),
-           title: Text('Profile')
-         )
-       ],
-     ),
     );
+
+    // return Scaffold(
+    //   appBar: AppBar(title: Text(widget.title),),
+    //   body: _children[_currentIndex],
+    //   floatingActionButton: FloatingActionButton(
+    //     onPressed: _incrementCounter,
+    //     tooltip: 'Increment',
+    //     child: Icon(Icons.add),
+    //   ),
+    //   bottomNavigationBar: BottomNavigationBar(
+    //    onTap: onTabTapped,
+    //    currentIndex: _currentIndex,
+    //    items: [
+    //      bar('AAA'),         
+    //      bar('BBB'),         
+    //      bar('CCC'),         
+    //    ],
+    //  ),
+    // );
   }
 }
